@@ -1,5 +1,7 @@
 import { compose, createStore, applyMiddleware } from 'redux'
+import { persistStore, persistReducer } from 'redux-persist'
 import { logger } from "redux-logger/src";
+import storage from 'redux-persist/lib/storage'
 
 import { rootReducer } from "./root-reducer";
 
@@ -20,7 +22,16 @@ import { rootReducer } from "./root-reducer";
 const middleWares = [logger]
 // const middleWares = [loggerMiddleware]
 
+const persistConfig = {
+  key: 'root',
+  storage,
+  blacklist: ['user']
+}
+
+const persistedReducer = persistReducer(persistConfig, rootReducer)
+
 const composeEnhancers = compose(applyMiddleware(...middleWares))
 
-export const store = createStore(rootReducer, undefined, composeEnhancers)
+export const store = createStore(persistedReducer, undefined, composeEnhancers)
 
+export const persistor = persistStore(store)
